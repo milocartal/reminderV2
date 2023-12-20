@@ -5,8 +5,9 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { prisma } from "~/server/db";
 
-export const postRouter = createTRPCRouter({
+export const userRouter = createTRPCRouter({
   hello: publicProcedure
     .input(z.object({ text: z.string() }))
     .query(({ input }) => {
@@ -16,23 +17,35 @@ export const postRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    .input(
+      z.object({
+        name: z.string().min(1),
+        groupId: z.string(),
+        endDate: z.date(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      // simulate a slow db call
+      // simulate a slow prisma call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      return ctx.db.post.create({
+      return prisma.reminder.create({
         data: {
           name: input.name,
-          createdBy: { connect: { id: ctx.session.user.id } },
+          createdById: ctx.session.user.id,
+          endDate: input.endDate,
+          updatedAt: new Date(),
+          groupId: input.groupId,
         },
       });
     }),
 
   getLatest: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.post.findFirst({
+    return prisma.reminder.findFirst({
       orderBy: { createdAt: "desc" },
-      where: { createdBy: { id: ctx.session.user.id } },
+      where: {
+        createdAt: { gte: new Date() },
+        createdBy: { id: ctx.session.user.id },
+      },
     });
   }),
 
