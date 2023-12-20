@@ -33,6 +33,7 @@ model Reminder {
     endDate     DateTime
 
     finished Boolean @default(false)
+    finishedAt DateTime?
 
     createdBy   User   @relation(fields: [createdById], references: [id])
     createdById String

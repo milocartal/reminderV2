@@ -1,18 +1,32 @@
+"use client";
+import { type NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-import { CreateReminder } from "~/components";
-import { getServerAuthSession } from "~/server/auth";
-import { api } from "~/trpc/server";
 
-export default async function Home() {
-  const session = await getServerAuthSession();
+const User: NextPage = () => {
+  const router = useRouter();
+  const {data: session, status} = useSession()
+  useEffect(() => {
+    // Vérifiez si l'utilisateur est authentifié
+    if ((status === 'authenticated' && !session) || status === 'unauthenticated') {
+      // Si l'utilisateur n'est pas authentifié, redirigez-le vers la page de connexion
+      return router.push('/group');
+    }
+  }, [status, session, router]);
+
+  if (status === 'loading') {
+    return <p>Vérification de l'authentification en cours...</p>;
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center text-black">
         
       <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-          Profil de l'utilisateur
+          {session?.user?.name}
         </h1>
         <div className="flex flex-col items-center gap-2">
 
@@ -29,27 +43,10 @@ export default async function Home() {
           </div>
         </div>
 
-        <CrudShowcase />
       </div>
     </main>
   );
 }
 
-async function CrudShowcase() {
-  const session = await getServerAuthSession();
-  if (!session?.user) return null;
 
-  const latestPost = await api.reminder.getLatest.query();
-
-  return (
-    <div className="w-full max-w-xs">
-      {latestPost ? (
-        <p className="truncate">Your most recent post: {latestPost.name}</p>
-      ) : (
-        <p>You have no posts yet.</p>
-      )}
-
-      <CreateReminder />
-    </div>
-  );
-}
+export default User;

@@ -15,8 +15,10 @@ export const Reminder: React.FC<ReminderComponent> = ({ reminder }) => {
         >
           <h3 className="text-2xl font-bold">{reminder.name} →</h3>
           <div className="text-lg">
-            {reminder.group.name}
+            Creer dans le groupe : {reminder.group.name}
           </div>
+          <p>à faire pour le {reminder.endDate.toLocaleDateString()}</p>
+          <p>Status : {reminder.endDate > new Date() ? "en cours":(reminder.finished ? "terminé":"Expiré")}</p>
         </Link>
   );
 };

@@ -1,12 +1,30 @@
+"use client";
+import { type NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Reminder } from "~/components";
+import { api } from "~/trpc/react";
 
-import { CreateReminder, Reminder } from "~/components";
-import { getServerAuthSession } from "~/server/auth";
-import { api } from "~/trpc/server";
-
-export default async function Home() {
-  const session = await getServerAuthSession();
-  const reminders = await api.reminder.getAll.query();
+const Home: NextPage = () => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { data: reminders } = api.reminder.getAll.useQuery();
+  useEffect(() => {
+    // Vérifiez si l'utilisateur est authentifié
+    if (
+      (status === "authenticated" && !session) ||
+      status === "unauthenticated"
+    ) {
+      // Si l'utilisateur n'est pas authentifié, redirigez-le vers la page de connexion
+      void router.push("/login");
+      return;
+    }
+  });
+  if (status === "loading") {
+    return <p>Vérification de l'authentification en cours...</p>;
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start pt-10 text-black">
@@ -50,26 +68,8 @@ export default async function Home() {
         </div>
       </div>
 
-      <CrudShowcase />
     </main>
   );
-}
+};
 
-async function CrudShowcase() {
-  const session = await getServerAuthSession();
-  if (!session?.user) return null;
-
-  const latestPost = await api.reminder.getLatest.query();
-
-  return (
-    <div className="w-full max-w-xs">
-      {latestPost ? (
-        <p className="truncate">Your most recent post: {latestPost.name}</p>
-      ) : (
-        <p>You have no posts yet.</p>
-      )}
-
-      <CreateReminder />
-    </div>
-  );
-}
+export default Home;

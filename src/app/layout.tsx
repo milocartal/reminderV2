@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
 
 import { TRPCReactProvider } from "~/trpc/react";
-import { NavBar } from "~/components";
+import NextAuthProvider from "../auth/react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,10 +24,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`relative font-sans ${inter.variable} pl-32 bg-primary-100`}>
+      <body
+        className={`relative font-sans ${inter.variable} bg-primary-100`}
+      >
         <TRPCReactProvider cookies={cookies().toString()}>
-          <NavBar />
-          {children}
+          <NextAuthProvider>
+            {children}
+          </NextAuthProvider>
         </TRPCReactProvider>
       </body>
     </html>

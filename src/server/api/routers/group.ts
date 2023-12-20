@@ -8,6 +8,16 @@ import {
 import { prisma } from "~/server/db";
 
 export const groupRouter = createTRPCRouter({
+  getAll: protectedProcedure.query(({ ctx }) => {
+    return prisma.group.findMany({
+      orderBy: { createdAt: "desc" },
+      where: { members: { some: { id: ctx.session.user.id } } },
+      include:{
+        members: true,
+        reminders: true,
+      }
+    });
+  }),
   create: protectedProcedure
     .input(
       z.object({

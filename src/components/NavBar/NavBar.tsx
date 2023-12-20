@@ -8,19 +8,19 @@ export const NavBar: React.FC = () => {
   return (
     <nav className="absolute top-0 left-0 flex h-screen w-32 flex-col items-center justify-between bg-primary-500 py-4 text-white">
       <div className="flex flex-col gap-4 items-center">
-        <Link href={"/"} className="text-lg">
-          <FaHome className="m-auto text-4xl" /> Home
+        <Link href={"/"} className="text-sm">
+          <FaHome className="m-auto text-4xl mb-1" /> Home
         </Link>
-        <Link href={"/group"} className="text-lg">
-          <FaUserGroup className="m-auto text-3xl" /> Groupes
+        <Link href={"/group"} className="text-sm">
+          <FaUserGroup className="m-auto text-4xl mb-1" /> Groupes
         </Link>
-        <Link href={"/reminder"} className="text-lg">
-          <FaTasks className="m-auto text-3xl" /> Tâches
+        <Link href={"/reminder"} className="text-sm">
+          <FaTasks className="m-auto text-4xl mb-1" /> Tâches
         </Link>
       </div>
 
-      <Link href={"/profile"} className="text-lg">
-        <FaUserAstronaut className="m-auto text-3xl" /> Profil
+      <Link href={"/profile"} className="text-sm">
+        <FaUserAstronaut className="m-auto text-4xl mb-1" /> Profil
       </Link>
     </nav>
   );
