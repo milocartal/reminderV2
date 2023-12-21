@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   createTRPCRouter,
   protectedProcedure,
-  publicProcedure,
+  //publicProcedure,
 } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
 
@@ -12,12 +12,13 @@ export const groupRouter = createTRPCRouter({
     return prisma.group.findMany({
       orderBy: { createdAt: "desc" },
       where: { members: { some: { id: ctx.session.user.id } } },
-      include:{
+      include: {
         members: true,
         reminders: true,
-      }
+      },
     });
   }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -34,6 +35,32 @@ export const groupRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
         },
+      });
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        description: z.string(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      return prisma.group.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          description: input.description,
+        },
+      });
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      return prisma.group.delete({
+        where: { id: input.id },
       });
     }),
 

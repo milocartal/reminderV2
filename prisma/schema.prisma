@@ -32,8 +32,9 @@ model Reminder {
     updatedAt   DateTime @updatedAt
     endDate     DateTime
 
-    finished Boolean @default(false)
+    finished   Boolean   @default(false)
     finishedAt DateTime?
+    expired    Boolean   @default(false)
 
     createdBy   User   @relation(fields: [createdById], references: [id])
     createdById String

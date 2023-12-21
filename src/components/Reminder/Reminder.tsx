@@ -25,34 +25,60 @@ export const Reminder: React.FC<ReminderComponent> = ({ reminder }) => {
 
 export const CreateReminder: React.FC = () => {
   const router = useRouter();
-  const [name, setName] = useState("");
+  
+  const {data: groups} = api.group.getAll.useQuery();
+  
 
   const createReminder = api.reminder.create.useMutation({
     onSuccess: () => {
       router.refresh();
-      setName("");
     },
   });
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const target = e.target as typeof e.target & {
+      name: { value: string };
+      endDate: { value: string };
+      groupId: { value: string };
+      description: { value: string };
+    };
+    const name = target.name.value;
+    const endDate = new Date(target.endDate.value)
+    const groupId = target.groupId.value;
+    const description = target.description.value;
+    console.log(name, endDate, groupId, description)
+
+    createReminder.mutate({
+      name: name,
+      endDate: endDate,
+      groupId: groupId,
+      description: description,
+    });
+  }
+
   return (
     <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        createReminder.mutate({
-          name: name,
-          endDate: new Date(),
-          groupId: "clqcf13nz0000n0ct8k2om9gy",
-        });
-      }}
+      onSubmit={(e) => handleSubmit(e)}
       className="flex flex-col gap-2"
     >
+      <select className="w-full rounded-full px-4 py-2 text-black" name="groupId">
+        <option value="">Choisir un groupe</option>
+        {groups?.map((group) => (
+          <option key={group.id} value={group.id}>
+            {group.name}
+          </option>
+        ))
+        }
+      </select>
       <input
         type="text"
         placeholder="Title"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
         className="w-full rounded-full px-4 py-2 text-black"
+        name="name"
       />
+      <input type="date" className="w-full rounded-full px-4 py-2 text-black" name="endDate"/>
+      <textarea cols={30} rows={5} className="w-full rounded-xl px-4 py-2 text-black" placeholder="Description" name="description"></textarea>
       <button
         type="submit"
         className="rounded-full bg-black/10 px-10 py-3 font-semibold transition hover:bg-black/20"

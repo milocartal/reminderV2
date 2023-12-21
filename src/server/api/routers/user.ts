@@ -3,19 +3,11 @@ import { z } from "zod";
 import {
   createTRPCRouter,
   protectedProcedure,
-  publicProcedure,
+  //publicProcedure,
 } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
 
 export const userRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
   create: protectedProcedure
     .input(
       z.object({
@@ -39,17 +31,14 @@ export const userRouter = createTRPCRouter({
       });
     }),
 
-  getLatest: protectedProcedure.query(({ ctx }) => {
-    return prisma.reminder.findFirst({
-      orderBy: { createdAt: "desc" },
-      where: {
-        createdAt: { gte: new Date() },
-        createdBy: { id: ctx.session.user.id },
-      },
-    });
-  }),
-
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
+  update: protectedProcedure
+    .input(z.object({ id: z.string(), name: z.string().min(1) }))
+    .mutation(async ({ input }) => {
+      return prisma.user.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+        },
+      });
+    }),
 });
