@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { type GroupComponent } from "./Group.type";
-import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 import { useState } from "react";
 import { loremIpsum } from "lorem-ipsum";
@@ -27,7 +26,6 @@ export const Group: React.FC<GroupComponent> = ({ group, style }) => {
 };
 
 export const CreateGroup: React.FC = () => {
-  const router = useRouter();
 
   const [desc, setDesc] = useState("");
 

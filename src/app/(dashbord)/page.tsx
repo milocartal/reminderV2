@@ -1,6 +1,6 @@
 "use client";
 import { type NextPage } from "next";
-import { useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -65,9 +65,14 @@ const Home: NextPage = () => {
           >
             {session ? "Sign out" : "Sign in"}
           </Link>
+          <button
+            className="rounded-full bg-black/10 px-10 py-3 font-semibold no-underline transition hover:bg-black/20"
+            onClick={session ? () => signOut() : () => signIn()}
+          >
+            {session ? "Sign out" : "Sign in"}
+          </button>
         </div>
       </div>
-
     </main>
   );
 };

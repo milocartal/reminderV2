@@ -41,7 +41,7 @@ const User: NextPage = () => {
 
   const handleDelete = async () => {
     deletegroup.mutate({ id: slug });
-    router.push("/");
+    router.push("/group");
   };
 
   return (

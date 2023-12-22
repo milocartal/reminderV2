@@ -1,9 +1,9 @@
 "use client";
 import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { ConnectButton } from "~/components";
 
 const Login: NextPage = () => {
   const { data: session, status } = useSession();
@@ -29,12 +29,7 @@ const Login: NextPage = () => {
           </p>
         )}
 
-        <Link
-          href={session ? "/api/auth/signout" : "/api/auth/signin"}
-          className="rounded-full bg-black/10 px-10 py-3 font-semibold no-underline transition hover:bg-black/20"
-        >
-          {session ? "Sign out" : "Se Connecter"}
-        </Link>
+        <ConnectButton type="button" signInOptions="github"/>
       </div>
     </main>
   );
