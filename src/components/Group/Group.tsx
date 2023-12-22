@@ -1,8 +1,10 @@
-"use client"
+"use client";
 import Link from "next/link";
 import { type GroupComponent } from "./Group.type";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
+import { useState } from "react";
+import { loremIpsum } from "lorem-ipsum";
 
 export const Group: React.FC<GroupComponent> = ({ group, style }) => {
   return (
@@ -25,46 +27,50 @@ export const Group: React.FC<GroupComponent> = ({ group, style }) => {
 };
 
 export const CreateGroup: React.FC = () => {
-    const router = useRouter();
-  
-    const createGroup = api.group.create.useMutation({
-      onSuccess: () => {
-        router.refresh();
-      },
+  const router = useRouter();
+
+  const [desc, setDesc] = useState("");
+
+  const createGroup = api.group.create.useMutation({
+    onSuccess: () => {
+      window.location.reload();
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const target = e.target as typeof e.target & {
+      name: { value: string };
+      description: { value: string };
+    };
+    const name = target.name.value;
+    const description = target.description.value;
+    console.log(name, description);
+
+    createGroup.mutate({
+      name: name,
+      description: description,
     });
-  
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-      e.preventDefault();
-      const target = e.target as typeof e.target & {
-        name: { value: string };
-        endDate: { value: string };
-        groupId: { value: string };
-        description: { value: string };
-      };
-      const name = target.name.value;
-      const endDate = new Date(target.endDate.value)
-      const groupId = target.groupId.value;
-      const description = target.description.value;
-      console.log(name, endDate, groupId, description)
-  
-      createGroup.mutate({
-        name: name,
-        description: description,
-      });
-    }
-  
-    return (
-      <form
-        onSubmit={(e) => handleSubmit(e)}
-        className="flex flex-col gap-2"
-      >
+  }
+
+  return (
+    <>
+      <form onSubmit={(e) => handleSubmit(e)} className="flex flex-col gap-2">
         <input
           type="text"
           placeholder="Title"
           className="w-full rounded-full px-4 py-2 text-black"
           name="name"
         />
-        <textarea cols={30} rows={5} className="w-full rounded-xl px-4 py-2 text-black" placeholder="Description" name="description"></textarea>
+        <textarea
+          cols={30}
+          rows={5}
+          className="w-full rounded-xl px-4 py-2 text-black"
+          placeholder="Description"
+          name="description"
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+        ></textarea>
         <button
           type="submit"
           className="rounded-full bg-black/10 px-10 py-3 font-semibold transition hover:bg-black/20"
@@ -73,6 +79,11 @@ export const CreateGroup: React.FC = () => {
           {createGroup.isLoading ? "Submitting..." : "Submit"}
         </button>
       </form>
-    );
-  };
-  
+      <button
+        onClick={() => setDesc(loremIpsum({ count: 3, units: "sentences" }))}
+      >
+        Generate Lorem Ipsum
+      </button>
+    </>
+  );
+};

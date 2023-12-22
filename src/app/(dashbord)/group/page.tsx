@@ -2,6 +2,7 @@
 import { type NextPage } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { CreateGroup } from "~/components/Group/Group";
 
 import { api } from "~/trpc/react";
 
@@ -13,7 +14,7 @@ const Groups: NextPage = () => {
       <h1 className="mb-7 text-5xl font-extrabold tracking-tight">
         Liste des groupes du user
       </h1>
-      <Suspense fallback={ <p className="text-5xl">Chargement des resources</p>}>
+      <Suspense fallback={<p className="text-5xl absolute text-pink-500 z-20">Chargement des resources</p>}>
         {groups?.map((group) => (
           <Link
             key={group.id}
@@ -28,6 +29,7 @@ const Groups: NextPage = () => {
           </Link>
         ))}
       </Suspense>
+      <CreateGroup/>
     </main>
   );
 };

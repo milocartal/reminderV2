@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
@@ -34,6 +35,15 @@ export const userRouter = createTRPCRouter({
   update: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(1) }))
     .mutation(async ({ input }) => {
+      const temp = await prisma.user.findUnique({
+        where: { id: input.id },
+      });
+      if (!temp) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
       return prisma.user.update({
         where: { id: input.id },
         data: {

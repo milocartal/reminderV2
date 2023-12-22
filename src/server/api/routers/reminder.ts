@@ -9,37 +9,9 @@ import {
 import { prisma } from "~/server/db";
 
 export const reminderRouter = createTRPCRouter({
-  getAll: protectedProcedure.query(({ ctx }) => {
-    return prisma.reminder.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        group: true,
-        createdBy: true,
-      },
-      where: {
-        group: { members: { some: { id: ctx.session.user.id } } },
-      },
-    });
-  }),
-
-  getOne: protectedProcedure.input(z.object({ id: z.string() })).query(
-    async ({ input }) => {
-      const temp = await prisma.reminder.findUnique({
-        where: { id: input.id },
-        include: {
-          group: true,
-          createdBy: true,
-        },
-      });
-      if (!temp) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Reminder not found",
-        });
-      }
-      return temp;
-    }
-  ),
+  ///////////////////////////////////////////
+  /** CONSTRUCTOR */
+  ///////////////////////////////////////////
 
   create: protectedProcedure
     .input(
@@ -63,6 +35,14 @@ export const reminderRouter = createTRPCRouter({
           groupId: input.groupId,
           description: input.description,
         },
+      });
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      return prisma.reminder.delete({
+        where: { id: input.id },
       });
     }),
 
@@ -95,13 +75,22 @@ export const reminderRouter = createTRPCRouter({
       });
     }),
 
-  delete: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ input }) => {
-      return prisma.reminder.delete({
-        where: { id: input.id },
-      });
-    }),
+  ///////////////////////////////////////////
+  /** GETTER */
+  ///////////////////////////////////////////
+
+  getAll: protectedProcedure.query(({ ctx }) => {
+    return prisma.reminder.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        group: true,
+        createdBy: true,
+      },
+      where: {
+        group: { members: { some: { id: ctx.session.user.id } } },
+      },
+    });
+  }),
 
   getLatest: protectedProcedure.query(({ ctx }) => {
     return prisma.reminder.findFirst({
@@ -112,6 +101,29 @@ export const reminderRouter = createTRPCRouter({
       },
     });
   }),
+
+  getOne: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input }) => {
+      const temp = await prisma.reminder.findUnique({
+        where: { id: input.id },
+        include: {
+          group: true,
+          createdBy: true,
+        },
+      });
+      if (!temp) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Reminder not found",
+        });
+      }
+      return temp;
+    }),
+
+  ///////////////////////////////////////////
+  /** SETTER */
+  ///////////////////////////////////////////
 
   setFinished: protectedProcedure
     .input(z.object({ id: z.string(), finishedAt: z.date() }))
