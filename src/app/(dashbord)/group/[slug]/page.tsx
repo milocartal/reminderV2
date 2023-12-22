@@ -37,6 +37,7 @@ const User: NextPage = () => {
 
   if (groupStatus === "loading") {
     return <p>Vérification de l'authentification en cours...</p>;
+    ///kjgqsdhlqkshfdkqbns
   }
 
   const handleDelete = async () => {
