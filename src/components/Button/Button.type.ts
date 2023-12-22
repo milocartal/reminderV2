@@ -1,7 +1,7 @@
-export type ButtonComponent = TypeButton | TypeLink;
+export type ConnectButtonComponent = TypeButton | TypeLink;
 
 interface CommonButton {
-    type: "button" | "link";
+    type: "button" | "submit" | "reset" | "link" | undefined;
     style?: string
 }
 
@@ -13,4 +13,10 @@ interface TypeButton extends CommonButton {
 interface TypeLink extends CommonButton {
     type: "link";
     href?: string;
+}
+
+export interface ButtonPrimaryComponent extends TypeButton {
+    type: "button";
+    text: string;
+    onPress?: (e: React.SyntheticEvent, ...args: unknown[]) => void;
 }
